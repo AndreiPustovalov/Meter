@@ -17,14 +17,15 @@
 struct Proto_Packet_TypeDef rxPacket;
 uint32_t totalPower = 0;
 
-#define TX_SIZE 13
-char tx_data[TX_SIZE] = "000000,0000\r\n";
+#define TX_SIZE 22
+char tx_data[TX_SIZE];
 
 void fail(void);
-void fillBuffer(uint32_t power, uint16_t battery);
+uint8_t fillBuffer(uint32_t power, uint16_t battery, uint8_t packet);
 
 void main()
 {
+  uint8_t size;
   CLK_SYSCLKDivConfig(CLK_SYSCLKDiv_1); // 16 MHz clock
   
   SYSCFG_REMAPPinConfig(REMAP_Pin_USART1TxRxPortC, ENABLE);
@@ -34,6 +35,9 @@ void main()
   UART_Init();
 
   nRF24_Init();
+  
+  tx_data[TX_SIZE - 2] = '\r';
+  tx_data[TX_SIZE - 1] = '\n';
   
   if (!nRF24_Check()) {
     fail();
@@ -57,26 +61,30 @@ void main()
         fail();
       }
       totalPower += rxPacket.power;
-      fillBuffer(totalPower, rxPacket.voltage);
-      UART_Send(TX_SIZE);
+      size = fillBuffer(totalPower, rxPacket.voltage, rxPacket.packetNum);
+      UART_Send(tx_data + (TX_SIZE - size - 2), size + 2);
       GPIO_ToggleBits(LED_PORT, LED_PIN);
     }
   }
 }
 
-void fillBuffer(uint32_t power, uint16_t battery) {
-  uint8_t pos = 10;
-  while (battery) {
-    tx_data[pos] = (char)('0' + battery % 10);
+uint8_t fillBuffer(uint32_t power, uint16_t battery, uint8_t packet) {
+  uint8_t pos = TX_SIZE - 3;
+  do {
+    tx_data[pos--] = (char)('0' + battery % 10);
     battery /= 10;
-    --pos;
-  }
-  pos = 5;
-  while (power) {
-    tx_data[pos] = (char)('0' + power % 10);
+  } while (battery);
+  tx_data[pos--] = ',';
+  do {
+    tx_data[pos--] = (char)('0' + power % 10);
     power /= 10;
-    --pos;
-  }
+  } while (power);
+  tx_data[pos--] = ',';
+  do {
+    tx_data[pos--] = (char)('0' + packet % 10);
+    packet /= 10;
+  } while (packet);
+  return (uint8_t)(TX_SIZE - pos - 3);
 }
 
 void fail(void) {

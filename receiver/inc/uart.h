@@ -4,7 +4,7 @@
 #include "stm8l15x.h"
 
 void UART_Init(void);
-void UART_Send(uint8_t size);
+void UART_Send(char * tx_data, uint8_t size);
 @far @interrupt void DMA_TransactionComplete(void);
 
 #endif
