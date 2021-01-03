@@ -165,10 +165,10 @@ String.100.0=STM8L051F3
 
 [Root.Config.1.Settings.3]
 String.2.0=Compiling $(InputFile)...
-String.3.0=cxstm8 -i..\lib\inc  +mods0 -customC-pp -dSTM8L05X_LD_VL -i..\..\libs\nrf24-dma\inc -i..\..\libs\stm8l15x_stdperiph_driver\inc -iinc $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) $(InputFile)
+String.3.0=cxstm8 +mods0 -customOpt+compact -customC-pp -dSTM8L05X_LD_VL -i..\lib\inc -i..\..\libs\nrf24-dma\inc -i..\..\libs\stm8l15x_stdperiph_driver\inc -iinc $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) $(InputFile)
 String.4.0=$(IntermPath)$(InputName).$(ObjectExt)
 String.5.0=$(IntermPath)$(InputName).ls
-String.6.0=2020,12,28,22,17,19
+String.6.0=2020,12,29,22,58,4
 
 [Root.Config.1.Settings.4]
 String.2.0=Assembling $(InputFile)...
@@ -273,10 +273,10 @@ Int.1=0
 
 [Root.Misc.Config.1.Settings.1]
 String.2.0=Compiling $(InputFile)...
-String.3.0=cxstm8 -i..\lib\inc  +mods0 -customC-pp -dSTM8L05X_LD_VL -i..\..\libs\nrf24-dma\inc -i..\..\libs\stm8l15x_stdperiph_driver\inc -iinc $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) $(InputFile)
+String.3.0=cxstm8 +mods0 -customOpt+compact -customC-pp -dSTM8L05X_LD_VL -i..\lib\inc -i..\..\libs\nrf24-dma\inc -i..\..\libs\stm8l15x_stdperiph_driver\inc -iinc $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) $(InputFile)
 String.4.0=$(IntermPath)$(InputName).$(ObjectExt)
 String.5.0=$(IntermPath)$(InputName).ls
-String.6.0=2020,12,28,22,17,19
+String.6.0=2020,12,29,22,58,4
 
 [Root.Misc.Config.1.Settings.2]
 String.2.0=Assembling $(InputFile)...
@@ -371,10 +371,10 @@ Int.1=0
 
 [Root.Source Files.Config.1.Settings.1]
 String.2.0=Compiling $(InputFile)...
-String.3.0=cxstm8 -i..\lib\inc  +mods0 -customC-pp -dSTM8L05X_LD_VL -i..\..\libs\nrf24-dma\inc -i..\..\libs\stm8l15x_stdperiph_driver\inc -iinc $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) $(InputFile)
+String.3.0=cxstm8 +mods0 -customOpt+compact -customC-pp -dSTM8L05X_LD_VL -i..\lib\inc -i..\..\libs\nrf24-dma\inc -i..\..\libs\stm8l15x_stdperiph_driver\inc -iinc $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) $(InputFile)
 String.4.0=$(IntermPath)$(InputName).$(ObjectExt)
 String.5.0=$(IntermPath)$(InputName).ls
-String.6.0=2020,12,28,22,17,19
+String.6.0=2020,12,29,22,58,4
 
 [Root.Source Files.Config.1.Settings.2]
 String.2.0=Assembling $(InputFile)...
@@ -459,10 +459,10 @@ Int.1=0
 
 [Root.Include Files.Config.1.Settings.1]
 String.2.0=Compiling $(InputFile)...
-String.3.0=cxstm8 -i..\lib\inc  +mods0 -customC-pp -dSTM8L05X_LD_VL -i..\..\libs\nrf24-dma\inc -i..\..\libs\stm8l15x_stdperiph_driver\inc -iinc $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) $(InputFile)
+String.3.0=cxstm8 +mods0 -customOpt+compact -customC-pp -dSTM8L05X_LD_VL -i..\lib\inc -i..\..\libs\nrf24-dma\inc -i..\..\libs\stm8l15x_stdperiph_driver\inc -iinc $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) $(InputFile)
 String.4.0=$(IntermPath)$(InputName).$(ObjectExt)
 String.5.0=$(IntermPath)$(InputName).ls
-String.6.0=2020,12,28,22,17,19
+String.6.0=2020,12,29,22,58,4
 
 [Root.Include Files.Config.1.Settings.2]
 String.2.0=Assembling $(InputFile)...
@@ -542,10 +542,10 @@ Int.1=0
 
 [Root.Std Periph.Config.1.Settings.1]
 String.2.0=Compiling $(InputFile)...
-String.3.0=cxstm8 -i..\lib\inc  +mods0 -customC-pp -dSTM8L05X_LD_VL -i..\..\libs\nrf24-dma\inc -i..\..\libs\stm8l15x_stdperiph_driver\inc -iinc $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) $(InputFile)
+String.3.0=cxstm8 +mods0 -customOpt+compact -customC-pp -dSTM8L05X_LD_VL -i..\lib\inc -i..\..\libs\nrf24-dma\inc -i..\..\libs\stm8l15x_stdperiph_driver\inc -iinc $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) $(InputFile)
 String.4.0=$(IntermPath)$(InputName).$(ObjectExt)
 String.5.0=$(IntermPath)$(InputName).ls
-String.6.0=2020,12,28,22,17,19
+String.6.0=2020,12,29,22,58,4
 
 [Root.Std Periph.Config.1.Settings.2]
 String.2.0=Assembling $(InputFile)...
@@ -719,10 +719,10 @@ Int.1=0
 
 [Root.nRF24.Config.1.Settings.1]
 String.2.0=Compiling $(InputFile)...
-String.3.0=cxstm8 -i..\lib\inc  +mods0 -customC-pp -dSTM8L05X_LD_VL -i..\..\libs\nrf24-dma\inc -i..\..\libs\stm8l15x_stdperiph_driver\inc -iinc $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) $(InputFile)
+String.3.0=cxstm8 +mods0 -customOpt+compact -customC-pp -dSTM8L05X_LD_VL -i..\lib\inc -i..\..\libs\nrf24-dma\inc -i..\..\libs\stm8l15x_stdperiph_driver\inc -iinc $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) $(InputFile)
 String.4.0=$(IntermPath)$(InputName).$(ObjectExt)
 String.5.0=$(IntermPath)$(InputName).ls
-String.6.0=2020,12,28,22,17,19
+String.6.0=2020,12,29,22,58,4
 
 [Root.nRF24.Config.1.Settings.2]
 String.2.0=Assembling $(InputFile)...

@@ -25,34 +25,34 @@ extern void _stext();     /* startup routine */
 struct interrupt_vector const _vectab[] = {
 	{0x82, (interrupt_handler_t)_stext}, /* reset */
 	{0x82, NonHandledInterrupt}, /* trap  */
-	{0x82, NonHandledInterrupt}, /* irq0  */
-	{0x82, NonHandledInterrupt}, /* irq1  */
-	{0x82, DMA_TransactionComplete}, /* irq2  */
-	{0x82, NonHandledInterrupt}, /* irq3  */
-	{0x82, NonHandledInterrupt}, /* irq4  */
-	{0x82, NonHandledInterrupt}, /* irq5  */
-	{0x82, NonHandledInterrupt}, /* irq6  */
-	{0x82, NonHandledInterrupt}, /* irq7  */
-	{0x82, NonHandledInterrupt}, /* irq8  */
-	{0x82, NonHandledInterrupt}, /* irq9  */
-	{0x82, EXTI_nRF24_IRQ}, /* irq10 */
-	{0x82, NonHandledInterrupt}, /* irq11 */
-	{0x82, NonHandledInterrupt}, /* irq12 */
-	{0x82, NonHandledInterrupt}, /* irq13 */
-	{0x82, NonHandledInterrupt}, /* irq14 */
-	{0x82, NonHandledInterrupt}, /* irq15 */
-	{0x82, NonHandledInterrupt}, /* irq16 */
-	{0x82, NonHandledInterrupt}, /* irq17 */
-	{0x82, NonHandledInterrupt}, /* irq18 */
-	{0x82, NonHandledInterrupt}, /* irq19 */
-	{0x82, NonHandledInterrupt}, /* irq20 */
-	{0x82, NonHandledInterrupt}, /* irq21 */
-	{0x82, NonHandledInterrupt}, /* irq22 */
-	{0x82, NonHandledInterrupt}, /* irq23 */
-	{0x82, NonHandledInterrupt}, /* irq24 */
-	{0x82, NonHandledInterrupt}, /* irq25 */
-	{0x82, NonHandledInterrupt}, /* irq26 */
-	{0x82, NonHandledInterrupt}, /* USART1 transmit data register empty/transmission complete interrupt */
-	{0x82, NonHandledInterrupt}, /* irq28 */
-	{0x82, NonHandledInterrupt}, /* irq29 */
+	{0x82, NonHandledInterrupt}, /* TLI  */
+	{0x82, NonHandledInterrupt}, /* FLASH  */
+	{0x82, DMA_TransactionComplete}, /* DMA1 0/1  */
+	{0x82, NonHandledInterrupt}, /* DMA1 2/3  */
+	{0x82, NonHandledInterrupt}, /* RTC  */
+	{0x82, NonHandledInterrupt}, /* PVD  */
+	{0x82, NonHandledInterrupt}, /* EXTIB  */
+	{0x82, NonHandledInterrupt}, /* EXTID  */
+	{0x82, NonHandledInterrupt}, /* EXTI0  */
+	{0x82, NonHandledInterrupt}, /* EXTI1  */
+	{0x82, NonHandledInterrupt}, /* EXIT2 */
+	{0x82, NonHandledInterrupt}, /* EXTI3 */
+	{0x82, NonHandledInterrupt}, /* EXTI4 */
+	{0x82, NonHandledInterrupt}, /* EXTI5 */
+	{0x82, EXTI_nRF24_IRQ},      /* EXTI6 */
+	{0x82, NonHandledInterrupt}, /* EXTI7 */
+	{0x82, NonHandledInterrupt}, /* Reserved */
+	{0x82, NonHandledInterrupt}, /* CLK */
+	{0x82, NonHandledInterrupt}, /* ADC1 */
+	{0x82, NonHandledInterrupt}, /* TIM2 Update */
+	{0x82, NonHandledInterrupt}, /* TIM2 Capture */
+	{0x82, NonHandledInterrupt}, /* TIM3 Update */
+	{0x82, NonHandledInterrupt}, /* TIM3 Capture */
+	{0x82, NonHandledInterrupt}, /* RI */
+	{0x82, NonHandledInterrupt}, /* Reserved */
+	{0x82, NonHandledInterrupt}, /* TIME4 */
+	{0x82, NonHandledInterrupt}, /* SPI1 */
+	{0x82, NonHandledInterrupt}, /* USART1 tx */
+	{0x82, NonHandledInterrupt}, /* USART1 rx */
+	{0x82, NonHandledInterrupt}, /* I2C1 */
 };

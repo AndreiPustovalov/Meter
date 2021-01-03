@@ -1,11 +1,11 @@
 #ifndef __NRF24_CONF_H
 #define __NRF24_CONF_H
 
-#define CE_PORT   GPIOC
-#define CE_PIN    GPIO_Pin_4
+#define CE_PORT   GPIOB
+#define CE_PIN    GPIO_Pin_2
 
-#define CSN_PORT  GPIOA
-#define CSN_PIN   GPIO_Pin_3
+#define CSN_PORT  GPIOB
+#define CSN_PIN   GPIO_Pin_4
 
 #define SCK_PORT  GPIOB
 #define SCK_PIN   GPIO_Pin_5
@@ -16,7 +16,9 @@
 #define MISO_PORT GPIOB
 #define MISO_PIN  GPIO_Pin_7
 
-#define IRQ_PORT  GPIOA
-#define IRQ_PIN   GPIO_Pin_2
+#define IRQ_PORT  GPIOC
+#define IRQ_PIN   GPIO_Pin_6
+
+#define IRQ_EXTI  EXTI_Pin_6
 
 #endif

@@ -11,9 +11,6 @@
 #include "stm8l15x_rtc.h"
 #include "stm8l15x_syscfg.h"
 
-#define LED_PORT GPIOB
-#define LED_PIN GPIO_Pin_1
-
 struct Proto_Packet_TypeDef rxPacket;
 uint32_t totalPower = 0;
 
@@ -28,10 +25,8 @@ void main()
   uint8_t size;
   CLK_SYSCLKDivConfig(CLK_SYSCLKDiv_1); // 16 MHz clock
   
-  SYSCFG_REMAPPinConfig(REMAP_Pin_USART1TxRxPortC, ENABLE);
+  SYSCFG_REMAPPinConfig(REMAP_Pin_USART1TxRxPortA, ENABLE);
   
-  GPIO_Init(LED_PORT, LED_PIN, GPIO_Mode_Out_PP_Low_Fast);
-
   UART_Init();
 
   nRF24_Init();
@@ -62,8 +57,7 @@ void main()
       }
       totalPower += rxPacket.power;
       size = fillBuffer(totalPower, rxPacket.voltage, rxPacket.packetNum);
-      UART_Send(tx_data + (TX_SIZE - size - 2), size + 2);
-      GPIO_ToggleBits(LED_PORT, LED_PIN);
+      UART_Send(tx_data + (TX_SIZE - size - 2), (u8)(size + 2));
     }
   }
 }
@@ -89,6 +83,6 @@ uint8_t fillBuffer(uint32_t power, uint16_t battery, uint8_t packet) {
 
 void fail(void) {
   disableInterrupts();
-  GPIO_SetBits(LED_PORT, LED_PIN);
+  UART_Send("fail\r\n", 6);
   halt();
 }

@@ -8,8 +8,6 @@ uint16_t wait = 4095;
   
 
 void UART_Init(void) {
-//  GPIO_Init(GPIOC, GPIO_Pin_5, GPIO_Mode_Out_PP_High_Fast);
-//  GPIO_Init(GPIOC, GPIO_Pin_6, GPIO_Mode_In_PU_No_IT);
   CLK_PeripheralClockConfig(CLK_Peripheral_USART1, ENABLE);
   USART_Init(
     USART1, 

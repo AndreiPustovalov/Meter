@@ -11,6 +11,8 @@ Dependencies=
 Filename=sender\sender.stp
 Dependencies=
 [Options]
-ActiveProject=receiver
+ActiveProject=sender
 ActiveConfig=Debug
 AddSortedElements=1
+[.St7McuIcdConf]
+McuName=STM8L051F3
