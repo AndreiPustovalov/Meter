@@ -19,6 +19,7 @@
 #define IRQ_PORT  GPIOC
 #define IRQ_PIN   GPIO_Pin_6
 
-#define IRQ_EXTI  EXTI_Pin_6
+#define IRQ_EXTI_PIN  EXTI_Pin_6
+#define IRQ_EXTI_IT  EXTI_IT_Pin6
 
 #endif

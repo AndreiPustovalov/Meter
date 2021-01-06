@@ -17,6 +17,9 @@
 #define TRAN_PORT GPIOC
 #define TRAN_PIN GPIO_Pin_5
 
+#define TRAN_EXTI_IT EXTI_IT_Pin5
+#define TRAN_EXTI_PIN EXTI_Pin_5
+
 #define BLINK_TIME 1
 #define BLINK_DELAY 200
 
@@ -27,7 +30,7 @@ typedef enum {
 } Event_TypeDef;
 
 void RTC_WakeUpConfig(void);
-void TimerInit(void);
+void TimerInit(uint16_t period);
 void WakeUp(Event_TypeDef e);
 
 volatile uint16_t powerCounter = 0;
@@ -38,14 +41,23 @@ void main()
 {
   nRF24_TX_PCKT_TypeDef ret;
 
+  TimerInit(65535); // Startup time
+  enableInterrupts();
+  TIM2_Cmd(ENABLE);
+  wfi();
+  disableInterrupts();
   CLK_SYSCLKDivConfig(CLK_SYSCLKDiv_1); // 16 MHz clock
+  CLK_PeripheralClockConfig(CLK_Peripheral_TIM2, DISABLE);
+  TIM2_DeInit();
 
   ADC_Config();
-  TimerInit();
+  //TimerInit(12500); // Debounce period
 
   GPIO_Init(LED_PORT, LED_PIN, GPIO_Mode_Out_PP_High_Fast);
   GPIO_Init(TRAN_PORT, TRAN_PIN, GPIO_Mode_In_FL_IT);
 
+  EXTI_SetPinSensitivity(TRAN_EXTI_PIN, EXTI_Trigger_Falling);
+  
   nRF24_Init();
 
   if (!nRF24_Check()) {
@@ -80,7 +92,9 @@ void main()
         nRF24_Wake();
         if (nRF24_TXPacket(&txPacket, sizeof(txPacket)) == nRF24_TX_SUCCESS) {
           ++txPacket.packetNum;
-          powerCounter = 0;
+          disableInterrupts();
+          powerCounter = powerCounter - txPacket.power;
+          enableInterrupts();
           #ifdef DEBUG
           GPIO_ResetBits(LED_PORT, LED_PIN);
           delay_ms(BLINK_TIME);
@@ -122,9 +136,9 @@ void RTC_WakeUpConfig() {
   RTC_WakeUpCmd(ENABLE);
 }
 
-void TimerInit(void) {
+void TimerInit(uint16_t period) {
   CLK_PeripheralClockConfig(CLK_Peripheral_TIM2, ENABLE);
-  TIM2_TimeBaseInit(TIM2_Prescaler_128, TIM2_CounterMode_Up, 12500);
+  TIM2_TimeBaseInit(TIM2_Prescaler_128, TIM2_CounterMode_Up, period);
   TIM2_SelectOnePulseMode(TIM2_OPMode_Single);
   TIM2_ITConfig(TIM2_IT_Update, ENABLE);
 }
@@ -141,14 +155,14 @@ void WakeUp(Event_TypeDef e) {
 }
 
 @far @interrupt void EXTI_Tran_IRQ(void) {
-  EXTI_ClearITPendingBit(TRAN_PIN);
+  EXTI_ClearITPendingBit(TRAN_EXTI_IT);
   ++powerCounter;
-  TRAN_PORT->CR2 &= (uint8_t)(~(TRAN_PIN));
-  TIM2_Cmd(ENABLE);
-  WakeUp(Event_Debounce);
+//  TRAN_PORT->CR2 &= (uint8_t)(~(TRAN_PIN));
+//  TIM2_Cmd(ENABLE);
+//  WakeUp(Event_Debounce);
 }
 
 @far @interrupt void TIM2_ISR(void) {
   TIM2_ClearITPendingBit(TIM2_IT_Update);
-  TRAN_PORT->CR2 |= TRAN_PIN;
+  //TRAN_PORT->CR2 |= TRAN_PIN;
 }
