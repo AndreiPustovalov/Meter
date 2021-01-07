@@ -40,18 +40,15 @@ volatile Event_TypeDef lastEvent;
 void main()
 {
   nRF24_TX_PCKT_TypeDef ret;
-
-  TimerInit(65535); // Startup time
+  RTC_WakeUpConfig();
+  
   enableInterrupts();
-  TIM2_Cmd(ENABLE);
-  wfi();
+  halt();
   disableInterrupts();
+
   CLK_SYSCLKDivConfig(CLK_SYSCLKDiv_1); // 16 MHz clock
-  CLK_PeripheralClockConfig(CLK_Peripheral_TIM2, DISABLE);
-  TIM2_DeInit();
 
   ADC_Config();
-  //TimerInit(12500); // Debounce period
 
   GPIO_Init(LED_PORT, LED_PIN, GPIO_Mode_Out_PP_High_Fast);
   GPIO_Init(TRAN_PORT, TRAN_PIN, GPIO_Mode_In_FL_IT);
@@ -79,7 +76,6 @@ void main()
 
   RTC_WakeUpConfig();
   
-  CFG->GCR |= CFG_GCR_AL;
   enableInterrupts();
   halt();
   while (1) {
@@ -90,25 +86,29 @@ void main()
         txPacket.power = powerCounter;
         enableInterrupts();
         nRF24_Wake();
-        if (nRF24_TXPacket(&txPacket, sizeof(txPacket)) == nRF24_TX_SUCCESS) {
-          ++txPacket.packetNum;
-          disableInterrupts();
-          powerCounter = powerCounter - txPacket.power;
-          enableInterrupts();
-          #ifdef DEBUG
-          GPIO_ResetBits(LED_PORT, LED_PIN);
-          delay_ms(BLINK_TIME);
-          GPIO_SetBits(LED_PORT, LED_PIN);
-          #endif
-        } else {
-          GPIO_ResetBits(LED_PORT, LED_PIN);
-          delay_ms(BLINK_TIME);
-          GPIO_SetBits(LED_PORT, LED_PIN);
-          delay_ms(BLINK_DELAY);
-          GPIO_ResetBits(LED_PORT, LED_PIN);
-          delay_ms(BLINK_TIME);
-          GPIO_SetBits(LED_PORT, LED_PIN);
+        switch (nRF24_TXPacket(&txPacket, sizeof(txPacket))) {
+          case nRF24_TX_SUCCESS:
+            ++txPacket.packetNum;
+            disableInterrupts();
+            powerCounter = powerCounter - txPacket.power;
+            enableInterrupts();
+            #ifdef DEBUG
+            GPIO_ResetBits(LED_PORT, LED_PIN);
+            delay_ms(BLINK_TIME);
+            GPIO_SetBits(LED_PORT, LED_PIN);
+            #endif
+            break;
+          default:
+            GPIO_ResetBits(LED_PORT, LED_PIN);
+            delay_ms(BLINK_TIME);
+            GPIO_SetBits(LED_PORT, LED_PIN);
+            delay_ms(BLINK_DELAY);
+            GPIO_ResetBits(LED_PORT, LED_PIN);
+            delay_ms(BLINK_TIME);
+            GPIO_SetBits(LED_PORT, LED_PIN);
+            break;
         }
+        nRF24_PowerDown();
         lastEvent = Event_None;
         halt();
         break;
@@ -133,6 +133,7 @@ void RTC_WakeUpConfig() {
   RTC_ITConfig(RTC_IT_WUT, ENABLE);
   while(RTC_GetFlagStatus(RTC_FLAG_WUTWF) != SET);
   RTC_SetWakeUpCounter(742);  // (38000 / 16 / 16) hz * 30 sec = 4453
+  CFG->GCR |= CFG_GCR_AL;
   RTC_WakeUpCmd(ENABLE);
 }
 
@@ -157,12 +158,8 @@ void WakeUp(Event_TypeDef e) {
 @far @interrupt void EXTI_Tran_IRQ(void) {
   EXTI_ClearITPendingBit(TRAN_EXTI_IT);
   ++powerCounter;
-//  TRAN_PORT->CR2 &= (uint8_t)(~(TRAN_PIN));
-//  TIM2_Cmd(ENABLE);
-//  WakeUp(Event_Debounce);
 }
 
 @far @interrupt void TIM2_ISR(void) {
   TIM2_ClearITPendingBit(TIM2_IT_Update);
-  //TRAN_PORT->CR2 |= TRAN_PIN;
 }
