@@ -33,12 +33,14 @@ void RTC_WakeUpConfig(void);
 void TimerInit(uint16_t period);
 void WakeUp(Event_TypeDef e);
 
-volatile uint16_t powerCounter = 0;
-struct Proto_Packet_TypeDef txPacket = {0};
-volatile Event_TypeDef lastEvent;
+static volatile uint16_t powerCounter[2] = {0, 0};
+static volatile uint8_t counterIndex = 0;
+static struct Proto_Packet_TypeDef txPacket = {0};
+static volatile Event_TypeDef lastEvent;
 
 void main()
 {
+  uint16_t newPowerCounter;
   nRF24_TX_PCKT_TypeDef ret;
   RTC_WakeUpConfig();
   
@@ -82,16 +84,13 @@ void main()
     switch (lastEvent) {
       case Event_WakeUp:
         txPacket.voltage = ADC_MeasureBatVoltage();
-        disableInterrupts();
-        txPacket.power = powerCounter;
-        enableInterrupts();
+        counterIndex ^= 0x01;
+        txPacket.power = powerCounter[counterIndex ^ 0x01];
         nRF24_Wake();
         switch (nRF24_TXPacket(&txPacket, sizeof(txPacket))) {
           case nRF24_TX_SUCCESS:
             ++txPacket.packetNum;
-            disableInterrupts();
-            powerCounter = powerCounter - txPacket.power;
-            enableInterrupts();
+            powerCounter[counterIndex ^ 0x01] = 0;
             #ifdef DEBUG
             GPIO_ResetBits(LED_PORT, LED_PIN);
             delay_ms(BLINK_TIME);
@@ -157,7 +156,7 @@ void WakeUp(Event_TypeDef e) {
 
 @far @interrupt void EXTI_Tran_IRQ(void) {
   EXTI_ClearITPendingBit(TRAN_EXTI_IT);
-  ++powerCounter;
+  ++powerCounter[counterIndex];
 }
 
 @far @interrupt void TIM2_ISR(void) {

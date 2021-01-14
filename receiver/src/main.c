@@ -22,7 +22,8 @@ uint8_t fillBuffer(uint32_t power, uint16_t battery, uint8_t packet);
 
 void main()
 {
-  uint8_t size;
+  uint8_t size, lastNum = 255;
+  uint16_t lastPower = 0;
   CLK_SYSCLKDivConfig(CLK_SYSCLKDiv_1); // 16 MHz clock
   
   SYSCFG_REMAPPinConfig(REMAP_Pin_USART1TxRxPortA, ENABLE);
@@ -50,12 +51,19 @@ void main()
   );
   
   enableInterrupts();
+  UART_Send("Hello!\r\n", 8);
   while (1) {
     if (nRF24_Wait_IRQ(0)) {
       if (nRF24_RXPacket(&rxPacket, sizeof(rxPacket)) != nRF24_RX_PCKT_PIPE0) {
         fail();
       }
-      totalPower += rxPacket.power;
+      if (lastNum == rxPacket.packetNum - 1) {
+        totalPower += rxPacket.power;
+      } else if (lastNum == rxPacket.packetNum) {
+        totalPower = totalPower - lastPower + rxPacket.power;
+      }
+      lastPower = rxPacket.power;
+      lastNum = rxPacket.packetNum;
       size = fillBuffer(totalPower, rxPacket.voltage, rxPacket.packetNum);
       UART_Send(tx_data + (TX_SIZE - size - 2), (u8)(size + 2));
     }
@@ -82,7 +90,8 @@ uint8_t fillBuffer(uint32_t power, uint16_t battery, uint8_t packet) {
 }
 
 void fail(void) {
-  disableInterrupts();
+  enableInterrupts();
   UART_Send("fail\r\n", 6);
+  disableInterrupts();
   halt();
 }
