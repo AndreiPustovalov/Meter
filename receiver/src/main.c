@@ -57,7 +57,7 @@ void main()
       if (nRF24_RXPacket(&rxPacket, sizeof(rxPacket)) != nRF24_RX_PCKT_PIPE0) {
         fail();
       }
-      if (lastNum == rxPacket.packetNum - 1) {
+      if (lastNum == (uint8_t)(rxPacket.packetNum - 1)) {
         totalPower += rxPacket.power;
       } else if (lastNum == rxPacket.packetNum) {
         totalPower = totalPower - lastPower + rxPacket.power;

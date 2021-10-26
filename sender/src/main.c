@@ -23,6 +23,9 @@
 #define BLINK_TIME 1
 #define BLINK_DELAY 200
 
+// (38000 / 16 / 16) hz * 30 sec = 4453
+#define RTC_WAKE_UP_INTERVAL 13359
+
 typedef enum {
   Event_WakeUp,
   Event_Debounce,
@@ -131,7 +134,7 @@ void RTC_WakeUpConfig() {
 
   RTC_ITConfig(RTC_IT_WUT, ENABLE);
   while(RTC_GetFlagStatus(RTC_FLAG_WUTWF) != SET);
-  RTC_SetWakeUpCounter(742);  // (38000 / 16 / 16) hz * 30 sec = 4453
+  RTC_SetWakeUpCounter(RTC_WAKE_UP_INTERVAL);
   CFG->GCR |= CFG_GCR_AL;
   RTC_WakeUpCmd(ENABLE);
 }
@@ -144,8 +147,8 @@ void TimerInit(uint16_t period) {
 }
 
 void WakeUp(Event_TypeDef e) {
-  lastEvent = e;
   CFG->GCR &= (u8)~CFG_GCR_AL;
+  lastEvent = e;
 }
 
 @far @interrupt void RTC_Interrupt(void)

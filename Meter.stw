@@ -12,7 +12,7 @@ Filename=sender\sender.stp
 Dependencies=
 [Options]
 ActiveProject=sender
-ActiveConfig=Debug
+ActiveConfig=Release
 AddSortedElements=1
 [.St7McuIcdConf]
 McuName=STM8L051F3

@@ -73,6 +73,7 @@ Int.108=0
 String.6.0=2020,12,29,11,30,44
 String.100.0=$(TargetFName)
 String.101.0=
+String.102.0=
 String.103.0=.\;src;..\..\libs\stm8l15x_stdperiph_driver\inc;..\..\libs\stm8l15x_stdperiph_driver\src;..\..\libs\nrf24-dma\inc;..\..\libs\nrf24-dma\src;inc;..\lib\inc;..\lib\src;
 
 [Root.Config.0.Settings.2]
@@ -104,8 +105,8 @@ String.2.0=Running Linker
 String.3.0=clnk $(ToolsetLibOpts) -o $(OutputPath)$(TargetSName).sm8 -fakeInteger -fakeOutFile$(ProjectSFile).elf -fakeRunConv -fakeStartupcrtsi0.sm8 -fakeSemiAutoGen -fakeVectFilestm8_interrupt_vector.c -fakeVectAddr0x8000 -customMapFile -customMapFile-m$(OutputPath)$(TargetSName).map -p -sa -customCfgFile$(OutputPath)$(TargetSName).lkf 
 String.3.1=cvdwarf $(OutputPath)$(TargetSName).sm8
 String.4.0=$(OutputPath)$(TargetFName)
-String.5.0=$(OutputPath)$(ProjectSFile).elf $(OutputPath)$(TargetSName).map
-String.6.0=2020,12,30,0,29,16
+String.5.0=
+String.6.0=2021,3,27,11,29,52
 String.100.0=
 String.101.0=crtsi.st7
 String.102.0=+seg .const -b 0x8080 -m 0x1f80 -n .const -it
@@ -155,6 +156,7 @@ Int.108=0
 String.6.0=2020,12,29,11,30,44
 String.100.0=$(TargetFName)
 String.101.0=
+String.102.0=
 String.103.0=.\;src;..\..\libs\stm8l15x_stdperiph_driver\inc;..\..\libs\stm8l15x_stdperiph_driver\src;..\..\libs\nrf24-dma\inc;..\..\libs\nrf24-dma\src;inc;..\lib\inc;..\lib\src;
 
 [Root.Config.1.Settings.2]
@@ -164,10 +166,10 @@ String.100.0=STM8L051F3
 
 [Root.Config.1.Settings.3]
 String.2.0=Compiling $(InputFile)...
-String.3.0=cxstm8 +mods0 -customOpt+compact -customC-pp -i..\lib\inc -iinc -i..\..\libs\nrf24-dma\inc -i..\..\libs\stm8l15x_stdperiph_driver\inc $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) $(InputFile)
+String.3.0=cxstm8 +mods0 -customOpt +compact +split -customC +strict -pp -dSTM8L05X_LD_VL -i..\lib\inc -iinc -i..\..\libs\nrf24-dma\inc -i..\..\libs\stm8l15x_stdperiph_driver\inc $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) $(InputFile)
 String.4.0=$(IntermPath)$(InputName).$(ObjectExt)
 String.5.0=$(IntermPath)$(InputName).ls
-String.6.0=2020,12,29,22,58,4
+String.6.0=2021,3,27,11,32,33
 
 [Root.Config.1.Settings.4]
 String.2.0=Assembling $(InputFile)...
@@ -270,10 +272,10 @@ Int.1=0
 
 [Root.Misc.Config.1.Settings.1]
 String.2.0=Compiling $(InputFile)...
-String.3.0=cxstm8 +mods0 -customOpt+compact -customC-pp -i..\lib\inc -iinc -i..\..\libs\nrf24-dma\inc -i..\..\libs\stm8l15x_stdperiph_driver\inc $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) $(InputFile)
+String.3.0=cxstm8 +mods0 -customOpt +compact +split -customC +strict -pp -dSTM8L05X_LD_VL -i..\lib\inc -iinc -i..\..\libs\nrf24-dma\inc -i..\..\libs\stm8l15x_stdperiph_driver\inc $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) $(InputFile)
 String.4.0=$(IntermPath)$(InputName).$(ObjectExt)
 String.5.0=$(IntermPath)$(InputName).ls
-String.6.0=2020,12,29,22,58,4
+String.6.0=2021,3,27,11,32,33
 
 [Root.Misc.Config.1.Settings.2]
 String.2.0=Assembling $(InputFile)...
@@ -368,10 +370,10 @@ Int.1=0
 
 [Root.Source Files.Config.1.Settings.1]
 String.2.0=Compiling $(InputFile)...
-String.3.0=cxstm8 +mods0 -customOpt+compact -customC-pp -i..\lib\inc -iinc -i..\..\libs\nrf24-dma\inc -i..\..\libs\stm8l15x_stdperiph_driver\inc $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) $(InputFile)
+String.3.0=cxstm8 +mods0 -customOpt +compact +split -customC +strict -pp -dSTM8L05X_LD_VL -i..\lib\inc -iinc -i..\..\libs\nrf24-dma\inc -i..\..\libs\stm8l15x_stdperiph_driver\inc $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) $(InputFile)
 String.4.0=$(IntermPath)$(InputName).$(ObjectExt)
 String.5.0=$(IntermPath)$(InputName).ls
-String.6.0=2020,12,29,22,58,4
+String.6.0=2021,3,27,11,32,33
 
 [Root.Source Files.Config.1.Settings.2]
 String.2.0=Assembling $(InputFile)...
@@ -456,10 +458,10 @@ Int.1=0
 
 [Root.Include Files.Config.1.Settings.1]
 String.2.0=Compiling $(InputFile)...
-String.3.0=cxstm8 +mods0 -customOpt+compact -customC-pp -i..\lib\inc -iinc -i..\..\libs\nrf24-dma\inc -i..\..\libs\stm8l15x_stdperiph_driver\inc $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) $(InputFile)
+String.3.0=cxstm8 +mods0 -customOpt +compact +split -customC +strict -pp -dSTM8L05X_LD_VL -i..\lib\inc -iinc -i..\..\libs\nrf24-dma\inc -i..\..\libs\stm8l15x_stdperiph_driver\inc $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) $(InputFile)
 String.4.0=$(IntermPath)$(InputName).$(ObjectExt)
 String.5.0=$(IntermPath)$(InputName).ls
-String.6.0=2020,12,29,22,58,4
+String.6.0=2021,3,27,11,32,33
 
 [Root.Include Files.Config.1.Settings.2]
 String.2.0=Assembling $(InputFile)...
@@ -544,10 +546,10 @@ Int.1=0
 
 [Root.Std Periph.Config.1.Settings.1]
 String.2.0=Compiling $(InputFile)...
-String.3.0=cxstm8 +mods0 -customOpt+compact -customC-pp -i..\lib\inc -iinc -i..\..\libs\nrf24-dma\inc -i..\..\libs\stm8l15x_stdperiph_driver\inc $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) $(InputFile)
+String.3.0=cxstm8 +mods0 -customOpt +compact +split -customC +strict -pp -dSTM8L05X_LD_VL -i..\lib\inc -iinc -i..\..\libs\nrf24-dma\inc -i..\..\libs\stm8l15x_stdperiph_driver\inc $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) $(InputFile)
 String.4.0=$(IntermPath)$(InputName).$(ObjectExt)
 String.5.0=$(IntermPath)$(InputName).ls
-String.6.0=2020,12,29,22,58,4
+String.6.0=2021,3,27,11,32,33
 
 [Root.Std Periph.Config.1.Settings.2]
 String.2.0=Assembling $(InputFile)...
@@ -731,10 +733,10 @@ Int.1=0
 
 [Root.nRF24.Config.1.Settings.1]
 String.2.0=Compiling $(InputFile)...
-String.3.0=cxstm8 +mods0 -customOpt+compact -customC-pp -i..\lib\inc -iinc -i..\..\libs\nrf24-dma\inc -i..\..\libs\stm8l15x_stdperiph_driver\inc $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) $(InputFile)
+String.3.0=cxstm8 +mods0 -customOpt +compact +split -customC +strict -pp -dSTM8L05X_LD_VL -i..\lib\inc -iinc -i..\..\libs\nrf24-dma\inc -i..\..\libs\stm8l15x_stdperiph_driver\inc $(ToolsetIncOpts) -cl$(IntermPath) -co$(IntermPath) $(InputFile)
 String.4.0=$(IntermPath)$(InputName).$(ObjectExt)
 String.5.0=$(IntermPath)$(InputName).ls
-String.6.0=2020,12,29,22,58,4
+String.6.0=2021,3,27,11,32,33
 
 [Root.nRF24.Config.1.Settings.2]
 String.2.0=Assembling $(InputFile)...

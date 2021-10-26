@@ -45,6 +45,8 @@ void delay_ms(u16 n_ms)
   while(n_ms--)
   {
     wfe();
+    _asm("JRA next");
+    _asm("next:");
     TIM4_ClearITPendingBit(TIM4_IT_Update);
   }
 
@@ -82,6 +84,8 @@ void delay_10us(u16 n_10us)
   while(n_10us--)
   {
     wfe();
+    _asm("JRA next10");
+    _asm("next10:");
     TIM4_ClearITPendingBit(TIM4_IT_Update);
   }
 
