@@ -4,7 +4,7 @@
 
 bool dma_transaction_compelete = FALSE;
 bool uart_transmission_compelete = FALSE;
-uint16_t wait = 4095;
+uint16_t wait = 65535;
   
 
 void UART_Init(void) {

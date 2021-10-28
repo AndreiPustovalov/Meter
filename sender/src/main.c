@@ -24,7 +24,8 @@
 #define BLINK_DELAY 200
 
 // (38000 / 16 / 16) hz * 30 sec = 4453
-#define RTC_WAKE_UP_INTERVAL 13359
+#define RTC_WAKE_UP_INTERVAL 4453
+#define T10_SECONDS 1484
 
 typedef enum {
   Event_WakeUp,
@@ -47,19 +48,36 @@ void main()
   nRF24_TX_PCKT_TypeDef ret;
   RTC_WakeUpConfig();
   
+  RTC_SetWakeUpCounter(T10_SECONDS);
   enableInterrupts();
   halt();
   disableInterrupts();
+  RTC_SetWakeUpCounter(RTC_WAKE_UP_INTERVAL);
 
   CLK_SYSCLKDivConfig(CLK_SYSCLKDiv_1); // 16 MHz clock
 
   ADC_Config();
+  
+  GPIO_Init(GPIOA, GPIO_Pin_2, GPIO_Mode_In_PU_No_IT);
+  GPIO_Init(GPIOA, GPIO_Pin_3, GPIO_Mode_In_PU_No_IT);
+  GPIO_Init(GPIOB, GPIO_Pin_0, GPIO_Mode_In_PU_No_IT);
+  GPIO_Init(GPIOB, GPIO_Pin_1, GPIO_Mode_In_PU_No_IT);
+  GPIO_Init(GPIOC, GPIO_Pin_0, GPIO_Mode_In_PU_No_IT);
+  GPIO_Init(GPIOC, GPIO_Pin_1, GPIO_Mode_In_PU_No_IT);
+  GPIO_Init(GPIOC, GPIO_Pin_4, GPIO_Mode_In_PU_No_IT);
+  GPIO_Init(GPIOD, GPIO_Pin_0, GPIO_Mode_In_PU_No_IT);
 
-  GPIO_Init(LED_PORT, LED_PIN, GPIO_Mode_Out_PP_High_Fast);
+  GPIO_Init(LED_PORT, LED_PIN, GPIO_Mode_Out_PP_High_Slow);
   GPIO_Init(TRAN_PORT, TRAN_PIN, GPIO_Mode_In_FL_IT);
-
+  
   EXTI_SetPinSensitivity(TRAN_EXTI_PIN, EXTI_Trigger_Falling);
   
+  RTC_SetWakeUpCounter(T10_SECONDS);
+  enableInterrupts();
+  halt();
+  disableInterrupts();
+  RTC_SetWakeUpCounter(RTC_WAKE_UP_INTERVAL);
+
   nRF24_Init();
 
   if (!nRF24_Check()) {
@@ -94,7 +112,7 @@ void main()
           case nRF24_TX_SUCCESS:
             ++txPacket.packetNum;
             powerCounter[counterIndex ^ 0x01] = 0;
-            #ifdef DEBUG
+            #ifdef BLINK
             GPIO_ResetBits(LED_PORT, LED_PIN);
             delay_ms(BLINK_TIME);
             GPIO_SetBits(LED_PORT, LED_PIN);

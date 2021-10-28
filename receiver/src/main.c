@@ -17,8 +17,10 @@ uint32_t totalPower = 0;
 #define TX_SIZE 22
 char tx_data[TX_SIZE];
 
+
 void fail(void);
 uint8_t fillBuffer(uint32_t power, uint16_t battery, uint8_t packet);
+void UART_SendStr(char* tx_data, uint8_t size);
 
 void main()
 {
@@ -50,8 +52,8 @@ void main()
     nRF24_TXPower_0dBm
   );
   
-  enableInterrupts();
-  UART_Send("Hello!\r\n", 8);
+  enableInterrupts();  
+  UART_SendStr("Hello!\r\n", 8);
   while (1) {
     if (nRF24_Wait_IRQ(0)) {
       if (nRF24_RXPacket(&rxPacket, sizeof(rxPacket)) != nRF24_RX_PCKT_PIPE0) {
@@ -89,9 +91,15 @@ uint8_t fillBuffer(uint32_t power, uint16_t battery, uint8_t packet) {
   return (uint8_t)(TX_SIZE - pos - 3);
 }
 
+void UART_SendStr(char* s, uint8_t size) {
+  char *dest = tx_data;
+  while(*dest++ = *s++);
+  UART_Send(tx_data, size);
+}
+
 void fail(void) {
   enableInterrupts();
-  UART_Send("fail\r\n", 6);
+  UART_SendStr("fail\r\n", 6);
   disableInterrupts();
   halt();
 }
