@@ -18,7 +18,7 @@ uint32_t totalPower = 0;
 char tx_data[TX_SIZE];
 
 
-void fail(void);
+void fail(char* msg, uint8_t size);
 uint8_t fillBuffer(uint32_t power, uint16_t battery, uint8_t packet);
 void UART_SendStr(char* tx_data, uint8_t size);
 
@@ -38,7 +38,7 @@ void main()
   tx_data[TX_SIZE - 1] = '\n';
   
   if (!nRF24_Check()) {
-    fail();
+    fail("Failed to init\r\n", 16);
   }
   nRF24_RXMode(
     nRF24_RX_PIPE0, 
@@ -56,8 +56,16 @@ void main()
   UART_SendStr("Hello!\r\n", 8);
   while (1) {
     if (nRF24_Wait_IRQ(0)) {
-      if (nRF24_RXPacket(&rxPacket, sizeof(rxPacket)) != nRF24_RX_PCKT_PIPE0) {
-        fail();
+      size = nRF24_RXPacket(&rxPacket, sizeof(rxPacket));
+      if (size != nRF24_RX_PCKT_PIPE0) {
+        UART_SendStr("RX Error: ", 10);
+        tx_data[0] = (uint8_t)('0' + size % 16);
+        if (tx_data[0] > 57) tx_data[0] += 8;
+        tx_data[1] = (uint8_t)('0' + size % 16);
+        if (tx_data[1] > 57) tx_data[1] += 8;
+        tx_data[2] = '\r';
+        tx_data[3] = '\n';
+        fail(tx_data, 4);
       }
       if (lastNum == (uint8_t)(rxPacket.packetNum - 1)) {
         totalPower += rxPacket.power;
@@ -97,9 +105,9 @@ void UART_SendStr(char* s, uint8_t size) {
   UART_Send(tx_data, size);
 }
 
-void fail(void) {
+void fail(char* msg, uint8_t size) {
   enableInterrupts();
-  UART_SendStr("fail\r\n", 6);
+  UART_SendStr(msg, size);
   disableInterrupts();
   halt();
 }

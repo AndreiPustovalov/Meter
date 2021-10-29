@@ -600,6 +600,11 @@ Next=Root.Std Periph.Std Periph\inc...\..\libs\stm8l15x_stdperiph_driver\inc\stm
 [Root.Std Periph.Std Periph\inc...\..\libs\stm8l15x_stdperiph_driver\inc\stm8l15x_gpio.h]
 ElemType=File
 PathName=..\..\libs\stm8l15x_stdperiph_driver\inc\stm8l15x_gpio.h
+Next=Root.Std Periph.Std Periph\inc...\..\libs\stm8l15x_stdperiph_driver\inc\stm8l15x_pwr.h
+
+[Root.Std Periph.Std Periph\inc...\..\libs\stm8l15x_stdperiph_driver\inc\stm8l15x_pwr.h]
+ElemType=File
+PathName=..\..\libs\stm8l15x_stdperiph_driver\inc\stm8l15x_pwr.h
 Next=Root.Std Periph.Std Periph\inc...\..\libs\stm8l15x_stdperiph_driver\inc\stm8l15x_rtc.h
 
 [Root.Std Periph.Std Periph\inc...\..\libs\stm8l15x_stdperiph_driver\inc\stm8l15x_rtc.h]
@@ -654,6 +659,11 @@ Next=Root.Std Periph.Std Periph\src...\..\libs\stm8l15x_stdperiph_driver\src\stm
 [Root.Std Periph.Std Periph\src...\..\libs\stm8l15x_stdperiph_driver\src\stm8l15x_gpio.c]
 ElemType=File
 PathName=..\..\libs\stm8l15x_stdperiph_driver\src\stm8l15x_gpio.c
+Next=Root.Std Periph.Std Periph\src...\..\libs\stm8l15x_stdperiph_driver\src\stm8l15x_pwr.c
+
+[Root.Std Periph.Std Periph\src...\..\libs\stm8l15x_stdperiph_driver\src\stm8l15x_pwr.c]
+ElemType=File
+PathName=..\..\libs\stm8l15x_stdperiph_driver\src\stm8l15x_pwr.c
 Next=Root.Std Periph.Std Periph\src...\..\libs\stm8l15x_stdperiph_driver\src\stm8l15x_rtc.c
 
 [Root.Std Periph.Std Periph\src...\..\libs\stm8l15x_stdperiph_driver\src\stm8l15x_rtc.c]

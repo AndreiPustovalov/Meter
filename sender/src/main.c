@@ -10,6 +10,7 @@
 #include "nrf24.h"
 #include "delay.h"
 #include "protocol.h"
+#include "stm8l15x_pwr.h"
 
 #define LED_PORT GPIOB
 #define LED_PIN GPIO_Pin_3
@@ -25,66 +26,51 @@
 
 // (38000 / 16 / 16) hz * 30 sec = 4453
 #define RTC_WAKE_UP_INTERVAL 4453
-#define T10_SECONDS 1484
 
-typedef enum {
-  Event_WakeUp,
-  Event_Debounce,
-  Event_None
-} Event_TypeDef;
 
 void RTC_WakeUpConfig(void);
 void TimerInit(uint16_t period);
-void WakeUp(Event_TypeDef e);
+void WakeUp(void);
+void Sleep(void);
 
 static volatile uint16_t powerCounter[2] = {0, 0};
 static volatile uint8_t counterIndex = 0;
 static struct Proto_Packet_TypeDef txPacket = {0};
-static volatile Event_TypeDef lastEvent;
 
 void main()
 {
   uint16_t newPowerCounter;
   nRF24_TX_PCKT_TypeDef ret;
-  RTC_WakeUpConfig();
-  
-  RTC_SetWakeUpCounter(T10_SECONDS);
-  enableInterrupts();
-  halt();
-  disableInterrupts();
-  RTC_SetWakeUpCounter(RTC_WAKE_UP_INTERVAL);
 
-  CLK_SYSCLKDivConfig(CLK_SYSCLKDiv_1); // 16 MHz clock
+  CLK_SYSCLKDivConfig(CLK_SYSCLKDiv_2); // 8 MHz clock
 
-  ADC_Config();
-  
+  GPIO_Init(GPIOA, GPIO_Pin_0, GPIO_Mode_In_PU_No_IT);
   GPIO_Init(GPIOA, GPIO_Pin_2, GPIO_Mode_In_PU_No_IT);
   GPIO_Init(GPIOA, GPIO_Pin_3, GPIO_Mode_In_PU_No_IT);
   GPIO_Init(GPIOB, GPIO_Pin_0, GPIO_Mode_In_PU_No_IT);
   GPIO_Init(GPIOB, GPIO_Pin_1, GPIO_Mode_In_PU_No_IT);
+  GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_In_PU_No_IT);
   GPIO_Init(GPIOC, GPIO_Pin_0, GPIO_Mode_In_PU_No_IT);
   GPIO_Init(GPIOC, GPIO_Pin_1, GPIO_Mode_In_PU_No_IT);
   GPIO_Init(GPIOC, GPIO_Pin_4, GPIO_Mode_In_PU_No_IT);
+  GPIO_Init(GPIOC, GPIO_Pin_5, GPIO_Mode_In_PU_No_IT);
   GPIO_Init(GPIOD, GPIO_Pin_0, GPIO_Mode_In_PU_No_IT);
 
   GPIO_Init(LED_PORT, LED_PIN, GPIO_Mode_Out_PP_High_Slow);
   GPIO_Init(TRAN_PORT, TRAN_PIN, GPIO_Mode_In_FL_IT);
   
-  EXTI_SetPinSensitivity(TRAN_EXTI_PIN, EXTI_Trigger_Falling);
+  PWR_UltraLowPowerCmd(ENABLE);
   
-  RTC_SetWakeUpCounter(T10_SECONDS);
-  enableInterrupts();
-  halt();
-  disableInterrupts();
-  RTC_SetWakeUpCounter(RTC_WAKE_UP_INTERVAL);
+  EXTI_SetPinSensitivity(TRAN_EXTI_PIN, EXTI_Trigger_Falling);
+
+  ADC_Config();
 
   nRF24_Init();
-
   if (!nRF24_Check()) {
     GPIO_ResetBits(LED_PORT, LED_PIN);
     halt();
   }
-  
+
   nRF24_TXMode(
     15,   // RetrCnt
     15,   // RetrDelay
@@ -96,51 +82,39 @@ void main()
     "pwmtr", // TX_Addr
     5        // TX_Addr_Width
   );
+  nRF24_PowerDown();
 
   RTC_WakeUpConfig();
-  
+  RTC_SetWakeUpCounter(RTC_WAKE_UP_INTERVAL);
+
   enableInterrupts();
-  halt();
   while (1) {
-    switch (lastEvent) {
-      case Event_WakeUp:
-        txPacket.voltage = ADC_MeasureBatVoltage();
-        counterIndex ^= 0x01;
-        txPacket.power = powerCounter[counterIndex ^ 0x01];
-        nRF24_Wake();
-        switch (nRF24_TXPacket(&txPacket, sizeof(txPacket))) {
-          case nRF24_TX_SUCCESS:
-            ++txPacket.packetNum;
-            powerCounter[counterIndex ^ 0x01] = 0;
-            #ifdef BLINK
-            GPIO_ResetBits(LED_PORT, LED_PIN);
-            delay_ms(BLINK_TIME);
-            GPIO_SetBits(LED_PORT, LED_PIN);
-            #endif
-            break;
-          default:
-            GPIO_ResetBits(LED_PORT, LED_PIN);
-            delay_ms(BLINK_TIME);
-            GPIO_SetBits(LED_PORT, LED_PIN);
-            delay_ms(BLINK_DELAY);
-            GPIO_ResetBits(LED_PORT, LED_PIN);
-            delay_ms(BLINK_TIME);
-            GPIO_SetBits(LED_PORT, LED_PIN);
-            break;
-        }
-        nRF24_PowerDown();
-        lastEvent = Event_None;
-        halt();
-        break;
-      case Event_Debounce:
-        lastEvent = Event_None;
-        wfi();
+    Sleep();
+    txPacket.voltage = ADC_MeasureBatVoltage();
+    counterIndex ^= 0x01;
+    txPacket.power = powerCounter[counterIndex ^ 0x01];
+    nRF24_Wake();
+    switch (nRF24_TXPacket(&txPacket, sizeof(txPacket))) {
+      case nRF24_TX_SUCCESS:
+        ++txPacket.packetNum;
+        powerCounter[counterIndex ^ 0x01] = 0;
+        #ifdef DEBUG
+        GPIO_ResetBits(LED_PORT, LED_PIN);
+        delay_ms(BLINK_TIME);
+        GPIO_SetBits(LED_PORT, LED_PIN);
+        #endif
         break;
       default:
-        lastEvent = Event_None;
-        halt();
+        GPIO_ResetBits(LED_PORT, LED_PIN);
+        delay_ms(BLINK_TIME);
+        GPIO_SetBits(LED_PORT, LED_PIN);
+        delay_ms(BLINK_DELAY);
+        GPIO_ResetBits(LED_PORT, LED_PIN);
+        delay_ms(BLINK_TIME);
+        GPIO_SetBits(LED_PORT, LED_PIN);
         break;
     }
+    nRF24_PowerDown();
   }
 }
 
@@ -164,15 +138,19 @@ void TimerInit(uint16_t period) {
   TIM2_ITConfig(TIM2_IT_Update, ENABLE);
 }
 
-void WakeUp(Event_TypeDef e) {
+void WakeUp() {
   CFG->GCR &= (u8)~CFG_GCR_AL;
-  lastEvent = e;
+}
+
+void Sleep() {
+  CFG->GCR |= CFG_GCR_AL;
+  halt();
 }
 
 @far @interrupt void RTC_Interrupt(void)
 {
   RTC_ClearITPendingBit(RTC_IT_WUT);
-  WakeUp(Event_WakeUp);
+  WakeUp();
 }
 
 @far @interrupt void EXTI_Tran_IRQ(void) {
