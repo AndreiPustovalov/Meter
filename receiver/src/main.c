@@ -11,6 +11,8 @@
 #include "stm8l15x_rtc.h"
 #include "stm8l15x_syscfg.h"
 
+const char hex_table[] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+
 struct Proto_Packet_TypeDef rxPacket;
 uint32_t totalPower = 0;
 
@@ -36,6 +38,7 @@ void main()
   
   tx_data[TX_SIZE - 2] = '\r';
   tx_data[TX_SIZE - 1] = '\n';
+  delay_ms(500);
   
   if (!nRF24_Check()) {
     fail("Failed to init\r\n", 16);
@@ -59,13 +62,13 @@ void main()
       size = nRF24_RXPacket(&rxPacket, sizeof(rxPacket));
       if (size != nRF24_RX_PCKT_PIPE0) {
         UART_SendStr("RX Error: ", 10);
-        tx_data[0] = (uint8_t)('0' + size % 16);
-        if (tx_data[0] > 57) tx_data[0] += 8;
-        tx_data[1] = (uint8_t)('0' + size % 16);
-        if (tx_data[1] > 57) tx_data[1] += 8;
+        tx_data[0] = hex_table[size % 16];
+        size /= 16;
+        tx_data[1] = hex_table[size % 16];
         tx_data[2] = '\r';
         tx_data[3] = '\n';
-        fail(tx_data, 4);
+        UART_Send(tx_data, 4);
+        continue;
       }
       if (lastNum == (uint8_t)(rxPacket.packetNum - 1)) {
         totalPower += rxPacket.power;

@@ -43,7 +43,7 @@ void main()
   nRF24_TX_PCKT_TypeDef ret;
 
   CLK_SYSCLKDivConfig(CLK_SYSCLKDiv_2); // 8 MHz clock
-
+  
   GPIO_Init(GPIOA, GPIO_Pin_0, GPIO_Mode_In_PU_No_IT);
   GPIO_Init(GPIOA, GPIO_Pin_2, GPIO_Mode_In_PU_No_IT);
   GPIO_Init(GPIOA, GPIO_Pin_3, GPIO_Mode_In_PU_No_IT);
@@ -60,12 +60,14 @@ void main()
   GPIO_Init(TRAN_PORT, TRAN_PIN, GPIO_Mode_In_FL_IT);
   
   PWR_UltraLowPowerCmd(ENABLE);
-  
+
+  nRF24_Init();
+  delay_ms(500);
+
   EXTI_SetPinSensitivity(TRAN_EXTI_PIN, EXTI_Trigger_Falling);
 
   ADC_Config();
 
-  nRF24_Init();
   if (!nRF24_Check()) {
     GPIO_ResetBits(LED_PORT, LED_PIN);
     halt();

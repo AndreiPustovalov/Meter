@@ -37,7 +37,8 @@ void delay_ms(u16 n_ms)
 
 /* Init TIMER 4 prescaler: / (2^6) = /64 */
 /* HSI div by 1 --> Auto-Reload value: 16M / 64 = 1/4M, 1/4M / 1k = 250*/
-  TIM4_TimeBaseInit(TIM4_Prescaler_64, 250);
+/* HSI div by 2 --> Auto-Reload value: 8M / 64 = 1/8M, 1/8M / 1k = 125*/
+  TIM4_TimeBaseInit(TIM4_Prescaler_64, 125);
   TIM4_ClearITPendingBit(TIM4_IT_Update);
   TIM4_SetCounter(4);
   TIM4_Cmd(ENABLE);
@@ -70,7 +71,8 @@ void delay_10us(u16 n_10us)
 
 /* prescaler: / (2^0) = /1 */
 /* SYS_CLK_HSI_DIV1 Auto-Reload value: 16M / 1 = 16M, 16M / 100k = 160 */
-  TIM4_TimeBaseInit(TIM4_Prescaler_1, 160);
+/* SYS_CLK_HSI_DIV2 Auto-Reload value: 8M / 1 = 8M, 8M / 100k = 80 */
+  TIM4_TimeBaseInit(TIM4_Prescaler_1, 80);
 
 /* Counter value: 10, to compensate the initialization of TIMER */
   TIM4_SetCounter(10);
