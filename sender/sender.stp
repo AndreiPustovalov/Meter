@@ -61,7 +61,7 @@ String.100.2=STM8 Cosmic
 String.100.3=ST7 Metrowerks V1.1
 String.100.4=Raisonance
 String.101.0=STM8 Cosmic
-String.102.0=D:\Program Files (x86)\COSMIC\FSE_Compilers
+String.102.0=
 String.103.0=
 String.104.0=Hstm8
 String.105.0=Lib
@@ -144,7 +144,7 @@ String.100.2=STM8 Cosmic
 String.100.3=ST7 Metrowerks V1.1
 String.100.4=Raisonance
 String.101.0=STM8 Cosmic
-String.102.0=D:\Program Files (x86)\COSMIC\FSE_Compilers
+String.102.0=
 String.103.0=
 String.104.0=Hstm8
 String.105.0=Lib
@@ -407,7 +407,7 @@ PathName=stm8_interrupt_vector.c
 [Root.Include Files]
 ElemType=Folder
 PathName=Include Files
-Child=Root.Include Files.inc\adc.h
+Child=Root.Include Files...\lib\inc\stm8l15x_conf.h
 Next=Root.Std Periph
 Config.0=Root.Include Files.Config.0
 Config.1=Root.Include Files.Config.1
@@ -477,6 +477,11 @@ String.3.0=
 String.4.0=
 String.5.0=
 String.6.0=2020,12,29,11,30,44
+
+[Root.Include Files...\lib\inc\stm8l15x_conf.h]
+ElemType=File
+PathName=..\lib\inc\stm8l15x_conf.h
+Next=Root.Include Files.inc\adc.h
 
 [Root.Include Files.inc\adc.h]
 ElemType=File

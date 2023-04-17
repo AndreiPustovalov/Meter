@@ -1,0 +1,8 @@
+*.wed
+*.wdb
+*.dep
+*.pdb
+Debug
+Release
+TAGS.txt
+TAGS_Filelist.txt

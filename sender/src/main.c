@@ -5,12 +5,14 @@
 
 #include "stm8l15x.h"
 #include "stm8l15x_gpio.h"
+#include "stm8l15x_tim2.h"
+#include "stm8l15x_pwr.h"
+#include "stm8l15x_exti.h"
 #include "main.h"
 #include "adc.h"
 #include "nrf24.h"
 #include "delay.h"
 #include "protocol.h"
-#include "stm8l15x_pwr.h"
 
 #define LED_PORT GPIOB
 #define LED_PIN GPIO_Pin_3
@@ -24,23 +26,16 @@
 #define BLINK_TIME 1
 #define BLINK_DELAY 200
 
-// (38000 / 16 / 16) hz * 30 sec = 4453
-#define RTC_WAKE_UP_INTERVAL 4453
-
-
-void RTC_WakeUpConfig(void);
 void TimerInit(uint16_t period);
 void WakeUp(void);
 void Sleep(void);
 
-static volatile uint16_t powerCounter[2] = {0, 0};
-static volatile uint8_t counterIndex = 0;
 static struct Proto_Packet_TypeDef txPacket = {0};
 
 void main()
 {
-  uint16_t newPowerCounter;
   nRF24_TX_PCKT_TypeDef ret;
+	uint16_t previous;
 
   CLK_SYSCLKDivConfig(CLK_SYSCLKDiv_2); // 8 MHz clock
   
@@ -57,14 +52,15 @@ void main()
   GPIO_Init(GPIOD, GPIO_Pin_0, GPIO_Mode_In_PU_No_IT);
 
   GPIO_Init(LED_PORT, LED_PIN, GPIO_Mode_Out_PP_High_Slow);
-  GPIO_Init(TRAN_PORT, TRAN_PIN, GPIO_Mode_In_FL_IT);
+	
+	TimerInit(6250); // 100ms
   
   PWR_UltraLowPowerCmd(ENABLE);
 
   nRF24_Init();
   delay_ms(500);
 
-  EXTI_SetPinSensitivity(TRAN_EXTI_PIN, EXTI_Trigger_Falling);
+  EXTI_SetPinSensitivity(TRAN_EXTI_PIN, EXTI_Trigger_Rising_Falling);
 
   ADC_Config();
 
@@ -84,28 +80,41 @@ void main()
     "pwmtr", // TX_Addr
     5        // TX_Addr_Width
   );
-  nRF24_PowerDown();
 
-  RTC_WakeUpConfig();
-  RTC_SetWakeUpCounter(RTC_WAKE_UP_INTERVAL);
+  nRF24_Wake();
+  txPacket.power = 255;
+	txPacket.voltage = ADC_MeasureBatVoltage();
+  if (GPIO_ReadInputDataBit(TRAN_PORT, TRAN_PIN))
+		txPacket.power = 1;
+	else
+	  txPacket.power = 0;
+  ret = nRF24_TXPacket(&txPacket, sizeof(txPacket));
+  nRF24_PowerDown();
+	
+	previous = txPacket.power;
 
   enableInterrupts();
   while (1) {
+    GPIO_Init(TRAN_PORT, TRAN_PIN, GPIO_Mode_In_PU_IT);
     Sleep();
-    txPacket.voltage = ADC_MeasureBatVoltage();
-    counterIndex ^= 0x01;
-    txPacket.power = powerCounter[counterIndex ^ 0x01];
+		if (GPIO_ReadInputDataBit(TRAN_PORT, TRAN_PIN))
+			txPacket.power = 1;
+		else
+		  txPacket.power = 0;
+		if (previous == txPacket.power)
+		  continue;
     nRF24_Wake();
-    switch (nRF24_TXPacket(&txPacket, sizeof(txPacket))) {
+		ret = nRF24_TXPacket(&txPacket, sizeof(txPacket));
+    switch (ret) {
       case nRF24_TX_SUCCESS:
         ++txPacket.packetNum;
-        powerCounter[counterIndex ^ 0x01] = 0;
-        #ifdef DEBUG
+				previous = txPacket.power;
+        break;
+			case nRF24_NO_IRQ:
         GPIO_ResetBits(LED_PORT, LED_PIN);
         delay_ms(BLINK_TIME);
         GPIO_SetBits(LED_PORT, LED_PIN);
-        #endif
-        break;
+				break;
       default:
         GPIO_ResetBits(LED_PORT, LED_PIN);
         delay_ms(BLINK_TIME);
@@ -117,20 +126,9 @@ void main()
         break;
     }
     nRF24_PowerDown();
+		if ((txPacket.packetNum & 0xf) == 0)
+			txPacket.voltage = ADC_MeasureBatVoltage();
   }
-}
-
-void RTC_WakeUpConfig() {
-  CLK_RTCClockConfig(CLK_RTCCLKSource_LSI, CLK_RTCCLKDiv_16);
-  while (CLK_GetFlagStatus(CLK_FLAG_LSIRDY) == RESET);
-  CLK_PeripheralClockConfig(CLK_Peripheral_RTC, ENABLE);
-  RTC_WakeUpClockConfig(RTC_WakeUpClock_RTCCLK_Div16);
-
-  RTC_ITConfig(RTC_IT_WUT, ENABLE);
-  while(RTC_GetFlagStatus(RTC_FLAG_WUTWF) != SET);
-  RTC_SetWakeUpCounter(RTC_WAKE_UP_INTERVAL);
-  CFG->GCR |= CFG_GCR_AL;
-  RTC_WakeUpCmd(ENABLE);
 }
 
 void TimerInit(uint16_t period) {
@@ -138,6 +136,8 @@ void TimerInit(uint16_t period) {
   TIM2_TimeBaseInit(TIM2_Prescaler_128, TIM2_CounterMode_Up, period);
   TIM2_SelectOnePulseMode(TIM2_OPMode_Single);
   TIM2_ITConfig(TIM2_IT_Update, ENABLE);
+	TIM2_ClearITPendingBit(TIM2_IT_Update);
+	TIM2_Cmd(DISABLE);
 }
 
 void WakeUp() {
@@ -149,17 +149,13 @@ void Sleep() {
   halt();
 }
 
-@far @interrupt void RTC_Interrupt(void)
-{
-  RTC_ClearITPendingBit(RTC_IT_WUT);
-  WakeUp();
-}
-
 @far @interrupt void EXTI_Tran_IRQ(void) {
   EXTI_ClearITPendingBit(TRAN_EXTI_IT);
-  ++powerCounter[counterIndex];
+  TIM2_Cmd(ENABLE);
 }
 
 @far @interrupt void TIM2_ISR(void) {
   TIM2_ClearITPendingBit(TIM2_IT_Update);
+	GPIO_Init(TRAN_PORT, TRAN_PIN, GPIO_Mode_In_PU_No_IT);
+	WakeUp();
 }

@@ -14,7 +14,6 @@
 const char hex_table[] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
 
 struct Proto_Packet_TypeDef rxPacket;
-uint32_t totalPower = 0;
 
 #define TX_SIZE 22
 char tx_data[TX_SIZE];
@@ -70,14 +69,9 @@ void main()
         UART_Send(tx_data, 4);
         continue;
       }
-      if (lastNum == (uint8_t)(rxPacket.packetNum - 1)) {
-        totalPower += rxPacket.power;
-      } else if (lastNum == rxPacket.packetNum) {
-        totalPower = totalPower - lastPower + rxPacket.power;
-      }
-      lastPower = rxPacket.power;
+
       lastNum = rxPacket.packetNum;
-      size = fillBuffer(totalPower, rxPacket.voltage, rxPacket.packetNum);
+      size = fillBuffer(rxPacket.power, rxPacket.voltage, rxPacket.packetNum);
       UART_Send(tx_data + (TX_SIZE - size - 2), (u8)(size + 2));
     }
   }

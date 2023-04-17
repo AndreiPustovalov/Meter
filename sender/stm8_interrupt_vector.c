@@ -30,7 +30,7 @@ struct interrupt_vector const _vectab[] = {
 	{0x82, NonHandledInterrupt}, /* FLASH  */
 	{0x82, NonHandledInterrupt}, /* DMA1 0/1  */
 	{0x82, NonHandledInterrupt}, /* DMA1 2/3  */
-	{0x82, RTC_Interrupt},       /* RTC  */
+	{0x82, NonHandledInterrupt}, /* RTC  */
 	{0x82, NonHandledInterrupt}, /* PVD  */
 	{0x82, NonHandledInterrupt}, /* EXTIB  */
 	{0x82, NonHandledInterrupt}, /* EXTID  */
