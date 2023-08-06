@@ -2,6 +2,7 @@
 *.wdb
 *.dep
 *.pdb
+*.spy
 Debug
 Release
 TAGS.txt

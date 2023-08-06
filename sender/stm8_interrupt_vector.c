@@ -34,11 +34,11 @@ struct interrupt_vector const _vectab[] = {
 	{0x82, NonHandledInterrupt}, /* PVD  */
 	{0x82, NonHandledInterrupt}, /* EXTIB  */
 	{0x82, NonHandledInterrupt}, /* EXTID  */
-	{0x82, NonHandledInterrupt}, /* EXTI0  */
-	{0x82, NonHandledInterrupt}, /* EXTI1  */
-	{0x82, NonHandledInterrupt}, /* EXIT2 */
-	{0x82, NonHandledInterrupt}, /* EXTI3 */
-	{0x82, NonHandledInterrupt}, /* EXTI4 */
+	{0x82, EXTI_Tran_IRQ},       /* EXTI0  */
+	{0x82, EXTI_Tran_IRQ},       /* EXTI1  */
+	{0x82, EXTI_Tran_IRQ},       /* EXIT2 */
+	{0x82, EXTI_Tran_IRQ},       /* EXTI3 */
+	{0x82, EXTI_Tran_IRQ},       /* EXTI4 */
 	{0x82, EXTI_Tran_IRQ},       /* EXTI5 */
 	{0x82, EXTI_nRF24_IRQ},      /* EXTI6 */
 	{0x82, NonHandledInterrupt}, /* EXTI7 */

@@ -20,7 +20,7 @@ char tx_data[TX_SIZE];
 
 
 void fail(char* msg, uint8_t size);
-uint8_t fillBuffer(uint32_t power, uint16_t battery, uint8_t packet);
+uint8_t fillBuffer(void);
 void UART_SendStr(char* tx_data, uint8_t size);
 
 void main()
@@ -46,7 +46,7 @@ void main()
     nRF24_RX_PIPE0, 
     nRF24_ENAA_P0, 
     100, 
-    nRF24_DataRate_1Mbps, 
+    nRF24_DataRate_250kbps, 
     nRF24_CRC_2byte, 
     "pwmtr", 
     5, 
@@ -58,41 +58,63 @@ void main()
   UART_SendStr("Hello!\r\n", 8);
   while (1) {
     if (nRF24_Wait_IRQ(0)) {
-      size = nRF24_RXPacket(&rxPacket, sizeof(rxPacket));
-      if (size != nRF24_RX_PCKT_PIPE0) {
-        UART_SendStr("RX Error: ", 10);
-        tx_data[0] = hex_table[size % 16];
-        size /= 16;
-        tx_data[1] = hex_table[size % 16];
-        tx_data[2] = '\r';
-        tx_data[3] = '\n';
-        UART_Send(tx_data, 4);
-        continue;
-      }
+			size = nRF24_RXPacket(&rxPacket, sizeof(rxPacket));
+			if (size != nRF24_RX_PCKT_PIPE0) {
+				UART_SendStr("RX Error: ", 10);
+				tx_data[0] = hex_table[size % 16];
+				size /= 16;
+				tx_data[1] = hex_table[size % 16];
+				tx_data[2] = '\r';
+				tx_data[3] = '\n';
+				UART_Send(tx_data, 4);
+				continue;
+			}
 
-      lastNum = rxPacket.packetNum;
-      size = fillBuffer(rxPacket.power, rxPacket.voltage, rxPacket.packetNum);
-      UART_Send(tx_data + (TX_SIZE - size - 2), (u8)(size + 2));
+			lastNum = rxPacket.packetNum;
+			size = fillBuffer();
+			UART_Send(tx_data + (TX_SIZE - size - 2), (u8)(size + 2));
     }
   }
 }
 
-uint8_t fillBuffer(uint32_t power, uint16_t battery, uint8_t packet) {
+uint8_t fillBuffer() {
   uint8_t pos = TX_SIZE - 3;
+	uint16_t val = rxPacket.voltage;
   do {
-    tx_data[pos--] = (char)('0' + battery % 10);
-    battery /= 10;
-  } while (battery);
+    tx_data[pos--] = (char)('0' + val % 10);
+    val /= 10;
+  } while (val);
   tx_data[pos--] = ',';
-  do {
-    tx_data[pos--] = (char)('0' + power % 10);
-    power /= 10;
-  } while (power);
+
+  if (rxPacket.io.input0)
+	  tx_data[pos--] = '1';
+	else
+	  tx_data[pos--] = '0';
   tx_data[pos--] = ',';
+
+  if (rxPacket.io.input1)
+	  tx_data[pos--] = '1';
+	else
+	  tx_data[pos--] = '0';
+  tx_data[pos--] = ',';
+
+  if (rxPacket.io.input2)
+	  tx_data[pos--] = '1';
+	else
+	  tx_data[pos--] = '0';
+  tx_data[pos--] = ',';
+
+  if (rxPacket.io.input3)
+	  tx_data[pos--] = '1';
+	else
+	  tx_data[pos--] = '0';
+  tx_data[pos--] = ',';
+
+  val = rxPacket.packetNum;
   do {
-    tx_data[pos--] = (char)('0' + packet % 10);
-    packet /= 10;
-  } while (packet);
+    tx_data[pos--] = (char)('0' + val % 10);
+    val /= 10;
+  } while (val);
   return (uint8_t)(TX_SIZE - pos - 3);
 }
 
